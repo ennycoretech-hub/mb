@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Meter Reading &amp; Billing Records</title>
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --cyan-50: #f0fdff;
+      --cyan-100: #d6f6fb;
+      --cyan-200: #aeeaf4;
+      --cyan-300: #6fd8ea;
+      --cyan-500: #06b6d4;
+      --cyan-600: #0891b2;
+      --cyan-700: #0e7490;
+      --cyan-900: #164e63;
+      --ink: #12313a;
+      --muted: #5d8592;
+      --line: #d9eff5;
+      --white: #ffffff;
+      --danger: #e11d48;
+      --danger-bg: #fff1f4;
+      --danger-line: #ffd3dd;
+    }
+
+    body {
+      margin: 0;
+      padding: 36px 16px 72px;
+      min-height: 100vh;
+      font-family: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(1100px 480px at 8% -12%, var(--cyan-100), transparent 62%),
+        radial-gradient(900px 420px at 100% 0%, #e6fbff, transparent 58%),
+        var(--white);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .card {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 30px 30px 36px;
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      box-shadow: 0 22px 50px -32px rgba(8, 145, 178, .5);
+    }
+
+    .card h1 {
+      margin: 0 0 8px;
+      font-size: 1.65rem;
+      line-height: 1.2;
+      letter-spacing: -.02em;
+      color: var(--cyan-900);
+    }
+
+    .subtitle {
+      margin: 0 0 24px;
+      font-size: .95rem;
+      line-height: 1.5;
+      color: var(--muted);
+    }
+
+    /* ---------- Input panel ---------- */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+      gap: 14px;
+      align-items: end;
+      padding: 18px;
+      background: linear-gradient(180deg, var(--cyan-50), var(--white));
+      border: 1px solid var(--line);
+      border-radius: 14px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .field span {
+      font-size: .74rem;
+      font-weight: 700;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      color: var(--cyan-700);
+    }
+
+    .field input{
+      width: 100%;
+      padding: 11px 13px;
+      font: inherit;
+      font-size: .95rem;
+      color: var(--ink);
+      background: var(--white);
+      border: 1px solid var(--cyan-200);
+      border-radius: 10px;
+      outline: none;
+      transition: border-color .18s ease, box-shadow .18s ease;
+    }
+
+    .field input::placeholder {
+      color: #9dbcc5;
+    }
+
+    .field input:focus {
+      border-color: var(--cyan-500);
+      box-shadow: 0 0 0 4px rgba(6, 182, 212, .16);
+    }
+
+    #searchBtn {
+      padding: 12px 26px;
+      font: inherit;
+      font-weight: 700;
+      letter-spacing: .02em;
+      color: var(--white);
+      white-space: nowrap;
+      background: linear-gradient(135deg, var(--cyan-500), var(--cyan-600));
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 12px 22px -14px rgba(8, 145, 178, .95);
+      transition: transform .15s ease, filter .2s ease, box-shadow .2s ease;
+    }
+
+    #searchBtn:hover {
+      filter: brightness(1.07);
+      transform: translateY(-1px);
+      box-shadow: 0 16px 26px -14px rgba(8, 145, 178, .95);
+    }
+
+    #searchBtn:active {
+      transform: translateY(0);
+    }
+
+    #searchBtn:focus-visible {
+      outline: 3px solid var(--cyan-300);
+      outline-offset: 2px;
+    }
+
+    /* ---------- Action toolbar ---------- */
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .btn {
+      padding: 11px 20px;
+      font: inherit;
+      font-size: .9rem;
+      font-weight: 600;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: background .18s ease, border-color .18s ease,
+                  color .18s ease, transform .15s ease, box-shadow .2s ease;
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .btn:focus-visible {
+      outline: 3px solid var(--cyan-300);
+      outline-offset: 2px;
+    }
+
+    .btn-ghost {
+      color: var(--cyan-700);
+      background: var(--white);
+      border-color: var(--cyan-200);
+    }
+
+    .btn-ghost:hover {
+      background: var(--cyan-50);
+      border-color: var(--cyan-300);
+    }
+
+    .btn-danger {
+      color: var(--danger);
+      background: var(--white);
+      border-color: var(--danger-line);
+    }
+
+    .btn-danger:hover {
+      background: var(--danger-bg);
+      border-color: #ffb8c8;
+    }
+
+    /* ---------- Records table ---------- */
+    #holder {
+      margin-top: 28px;
+      overflow-x: auto;
+      border-radius: 14px;
+    }
+
+    .records-table {
+      width: 100%;
+      min-width: 780px;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: .9rem;
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .records-table thead th {
+      padding: 13px 14px;
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      text-align: left;
+      white-space: nowrap;
+      color: var(--white);
+      background: linear-gradient(180deg, var(--cyan-600), var(--cyan-700));
+    }
+
+    .records-table tbody td {
+      padding: 12px 14px;
+      vertical-align: top;
+      line-height: 1.45;
+      color: var(--ink);
+      border-top: 1px solid var(--line);
+    }
+
+    .records-table tbody tr:nth-child(even) {
+      background: var(--cyan-50);
+    }
+
+    .records-table tbody tr:hover {
+      background: var(--cyan-100);
+    }
+
+    .records-table td.index {
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .records-table td.amount {
+      font-weight: 700;
+      color: var(--cyan-700);
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .records-table td.summary {
+      min-width: 280px;
+      color: var(--muted);
+    }
+
+    /* ---------- Feedback states ---------- */
+    .empty-state {
+      margin: 0;
+      padding: 28px 20px;
+      text-align: center;
+      font-size: .93rem;
+      color: var(--muted);
+      background: var(--cyan-50);
+      border: 1px dashed var(--cyan-200);
+      border-radius: 14px;
+    }
+
+    .message {
+      margin: 16px 0 0;
+      padding: 12px 16px;
+      font-size: .9rem;
+      border-radius: 10px;
+      position: absolute;
+      top:0;
+      right:0;
+    }
+
+    .message.error {
+      color: var(--danger);
+      background: var(--danger-bg);
+      border: 1px solid var(--danger-line);
+    }
+
+    /* ---------- Floating toast ---------- */
+    .meter-toast {
+      position: fixed;
+      left: 50%;
+      bottom: 28px;
+      z-index: 50;
+      padding: 12px 22px;
+      font-size: .88rem;
+      font-weight: 600;
+      color: var(--white);
+      background: var(--cyan-700);
+      border-radius: 999px;
+      box-shadow: 0 16px 30px -14px rgba(8, 145, 178, .8);
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(-50%, 16px);
+      transition: opacity .25s ease, transform .25s ease;
+    }
+
+    .meter-toast.is-visible {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    .meter-toast.is-error {
+      background: var(--danger);
+      box-shadow: 0 16px 30px -14px rgba(225, 29, 72, .7);
+    }
+
+    /* ---------- Responsive ---------- */
+    @media (max-width: 820px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      #searchBtn {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 560px) {
+      body {
+        padding: 20px 10px 48px;
+      }
+
+      .card {
+        padding: 20px 16px 26px;
+        border-radius: 16px;
+      }
+
+      .card h1 {
+        font-size: 1.35rem;
+      }
+
+      .toolbar .btn {
+        flex: 1 1 auto;
+      }
+    }
+    #vh{
+      font-weight:900;
+      color:black;
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="card">
+    <h1>Meter Reading &amp; Billing Records</h1>
+    <p class="subtitle">
+      Enter each customer's name, previous meter reading and current meter reading.
+        The rate per unit as which is Calculated as  <span id="vh"></span> Naira while 
+      the consumption and total cost are calculated automatically.
+    </p>
+
+    <div class="form-grid">
+      <label class="field">
+        <span>Customer Name</span>
+        <input type="text" id="nameInput" placeholder="e.g. Ada Okonkwo">
+      </label>
+
+      <label class="field">
+        <span>Previous Unit</span>
+        <input type="number" id="oldUnitInput" placeholder="e.g. 1200">
+      </label>
+
+      <label class="field">
+        <span>Current Unit</span>
+        <input type="number" id="newUnitInput" placeholder="e.g. 1345">
+      </label>
+
+      <button id="searchBtn" type="button">Add Record</button>
+    </div>
+
+    <!-- Action buttons -->
+    <div class="toolbar">
+      <button id="downloadBtn" type="button" class="btn btn-ghost"
+              onclick="MeterExport.download()">Download PNG</button>
+
+      <button id="shareBtn" type="button" class="btn btn-ghost"
+              onclick="MeterExport.share()">Share Image</button>
+
+      <button id="clearBtn" type="button" class="btn btn-danger"
+              onclick="MeterExport.clearAll()">Clear Previous Records</button>
+    </div>
+
+    <div id="holder"></div>
+  </main>
+  <script src="prac1.js"></script>
+  <script type="text/javascript" charset="utf-8">
+    let data = JSON.parse(localStorage.getItem('data')) || []
+
+    const nameInput = document.getElementById('nameInput')
+    const oldUnitInput = document.getElementById('oldUnitInput')
+    const newUnitInput = document.getElementById('newUnitInput')
+    const searchBtn = document.getElementById('searchBtn')
+    const holder = document.getElementById('holder')
+
+     let RATE_PER_UNIT = 250
+
+    /* Rounds a value to two decimal places, keeping the original behaviour. */
+    function roundToTwo(value) {
+      const text = String(value)
+      let result = value
+
+      if (text.includes('.')) {
+        const digits = text.split('')
+        const dotIndex = digits.indexOf('.')
+
+        if (digits[dotIndex + 2] >= 5) {
+          digits[dotIndex + 1] = String(+digits[dotIndex + 1] + 1)
+        }
+
+        if (dotIndex !== -1) {
+          for (let i = digits.length; i > dotIndex + 2; i--) {
+            digits.pop()
+          }
+          result = digits.join('')
+        }
+      }
+
+      return result
+    }
+
+    /* Adds a new billing record after validating the entries. */
+    function addRecord() {
+      const customerName = nameInput.value.trim()
+      const previousUnit = Number(oldUnitInput.value.trim())
+      const currentUnit = Number(newUnitInput.value.trim())
+
+      if (customerName === '' || oldUnitInput.value.trim() === '' || newUnitInput.value.trim() === '') {
+        showMessage('Please complete all three fields before saving the record.')
+        return
+      }
+
+      if (currentUnit > previousUnit) {
+        const difference = roundToTwo(currentUnit - previousUnit)
+        let tc = roundToTwo(difference * RATE_PER_UNIT)
+        let ff = ft(tc)
+        const totalCost = ff + ' Naira'
+        data.push({
+          name: customerName,
+          oldunit: previousUnit,
+          newunit: currentUnit,
+          diff: difference,
+          remark: `Customer ${customerName} recorded a previous reading of ${previousUnit} units and a current reading of ${currentUnit} units, consuming ${difference} units at a total cost of ${totalCost} .`,
+          cost: totalCost
+        })
+
+        nameInput.value = ''
+        oldUnitInput.value = ''
+        newUnitInput.value = ''
+
+        renderRecords()
+        localStorage.setItem('data', JSON.stringify(data))
+      } else {
+        showMessage('The current reading must be greater than the previous reading. Kindly recheck your figures.')
+      }
+    }
+
+    /* Displays a short feedback message beneath the table area. */
+    function showMessage(text) {
+      const message = document.createElement('p')
+      message.className = 'message error'
+      message.textContent = text
+      message.style.display ='block'
+      holder.appendChild(message)
+      setTimeout(()=>{message.style.display ='none'},1500)
+    }
+
+    /* Renders every saved record inside a labelled table. */
+    function renderRecords() {
+      holder.replaceChildren()
+
+      if (data.length === 0) {
+        const empty = document.createElement('p')
+        empty.className = 'empty-state'
+        empty.textContent = 'No records saved yet. Add your first meter reading above.'
+        holder.appendChild(empty)
+        return
+      }
+
+      const table = document.createElement('table')
+      table.className = 'records-table'
+
+      /* Table head */
+      const thead = document.createElement('thead')
+      const headRow = document.createElement('tr')
+      const headings = [
+        'S/N',
+        'Customer Name',
+        'Previous Unit',
+        'Current Unit',
+        'Consumption',
+        'Total Cost (Naira)',
+        'Summary'
+      ]
+
+      headings.forEach(function (heading) {
+        const th = document.createElement('th')
+        th.textContent = heading
+        headRow.appendChild(th)
+      })
+
+      thead.appendChild(headRow)
+      table.appendChild(thead)
+
+      /* Table body */
+      const tbody = document.createElement('tbody')
+      const ordered = data.slice().reverse()
+
+      ordered.forEach(function (record, index) {
+        const row = document.createElement('tr')
+        const values = [
+          index + 1,
+          record.name,
+          record.oldunit,
+          record.newunit,
+          record.diff,
+          record.cost,
+          record.remark
+        ]
+
+        values.forEach(function (value, cellIndex) {
+          const cell = document.createElement('td')
+          cell.textContent = value
+
+          if (cellIndex === 0) cell.classList.add('index')
+          if (cellIndex === 5) cell.classList.add('amount')
+          if (cellIndex === 6) cell.classList.add('summary')
+
+          row.appendChild(cell)
+        })
+
+        tbody.appendChild(row)
+      })
+
+      table.appendChild(tbody)
+      holder.appendChild(table)
+    }
+
+    searchBtn.addEventListener('click', addRecord)
+
+    /* Show any previously saved records on load. */
+    renderRecords()
+
+    /* ---- Bridge for meter-export.js ---- */
+    window.MeterApp = {
+      getData: function () { return data },
+      render: renderRecords,
+      reset: function () {
+        data.length = 0
+        renderRecords()
+      }
+    }
+    let vh = document.getElementById('vh')
+    function ur(){
+      let inp = document.createElement('input')
+      let inpr = document.createElement('button')
+      let sp = document.createElement('span')
+      let sj = document.createElement('span')
+      let div = document.createElement('div')
+      let divt = document.createElement('div')
+      inp.className = 'j'
+      inp.type = 'number'
+      inp.placeholder = `Click to change the current rate from ${RATE_PER_UNIT}`
+      inpr.innerHTML = 'update'
+      inpr.style.textTransform='uppercase'
+      sp.innerHTML= 'Enter Updated Rate Per Unit:'
+      inpr.onclick=()=>{
+        if(inp.value.trim() != ''){
+          RATE_PER_UNIT = inp.value.trim()
+          vh.innerHTML = RATE_PER_UNIT
+          divt.style.display = 'none'
+        }else{
+          sj.innerHTML =  'Input a number '
+          div.appendChild(sj)
+          sj.style.color = 'red'
+          sj.style.display = 'block'
+          setTimeout(()=>{sj.style.display = 'none'},1500)
+        }
+      }
+      inpr.style.color = 'rgba(0,0,200,0.9)'
+      inpr.className = 'btn'
+      inpr.style.background = 'cyan'
+      div.style.background = 'rgba(0,0,200,0.1)'
+      
+      div.style.padding = '2%'
+      div.style.borderRadius = '10%'
+      divt.className = 'form-grid'
+      sp.style.color = 'rgba(0,0,200,0.5)'
+      sp.style.fontWeight = '700'
+      div.appendChild(sp)
+      div.appendChild(inp)
+      div.appendChild(inpr)
+      
+      divt.appendChild(div)
+      div.style.position = 'fixed'
+      div.className='field'
+      let jk = `${Math.floor(Math.random()*100)}px`
+      console.log(jk)
+      div.style.top = jk
+      div.style.right = '5%'
+      document.getElementsByClassName('card')[0].appendChild(divt)
+    }
+    vh.addEventListener('click',ur)
+    vh.innerHTML = RATE_PER_UNIT
+
+  </script>
+
+  <!-- External canvas exporter — must load AFTER the inline script above -->
+  <script src="meter-export.js"></script>
+
+</body>
+
+</html>
