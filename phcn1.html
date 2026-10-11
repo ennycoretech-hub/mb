@@ -117,7 +117,7 @@
       box-shadow: 0 0 0 4px rgba(6, 182, 212, .16);
     }
 
-    #searchBtn {
+    #searchBtn{
       padding: 12px 26px;
       font: inherit;
       font-weight: 700;
@@ -352,6 +352,31 @@
       font-weight:900;
       color:black;
     }
+    .subs {
+      text-align:center;
+      text-decoration: none;
+      text-transform: capitalize;
+      margin-top:4%;
+      color:inherit;
+      
+      
+    }
+    .subs a{
+      text-align:justify;
+text-decoration: none;
+text-transform: capitalize;
+margin-top:4%;
+color:inherit;
+line-height: 1.5;
+
+
+
+    }
+    .subs:hover,.subs:active{
+      background:linear-gradient(to left,rgba(0,0,255,0.3),rgba(0,30,200,0.9));
+      color:white;
+      
+    }
   </style>
 </head>
 
@@ -397,6 +422,9 @@
     </div>
 
     <div id="holder"></div>
+   <p class="subtitle subs btn btn-ghost"> <a Any Problem  href="mailto:etsolution.tech@gmail.com?subject=Feedback">Encountered a problem? click me </a>
+
+   </p>
   </main>
   <script src="prac1.js"></script>
   <script type="text/javascript" charset="utf-8">
@@ -409,6 +437,8 @@
     const holder = document.getElementById('holder')
 
      let RATE_PER_UNIT = 250
+     
+     
 
     /* Rounds a value to two decimal places, keeping the original behaviour. */
     function roundToTwo(value) {
@@ -450,6 +480,7 @@
         let tc = roundToTwo(difference * RATE_PER_UNIT)
         let ff = ft(tc)
         const totalCost = ff + ' Naira'
+        
         data.push({
           name: customerName,
           oldunit: previousUnit,
@@ -458,7 +489,10 @@
           remark: `Customer ${customerName} recorded a previous reading of ${previousUnit} units and a current reading of ${currentUnit} units, consuming ${difference} units at a total cost of ${totalCost} .`,
           cost: totalCost,
           costh:+tc
+          
         })
+        
+        
 
         nameInput.value = ''
         oldUnitInput.value = ''
@@ -483,6 +517,7 @@
 
     /* Renders every saved record inside a labelled table. */
     function renderRecords() {
+      
       holder.replaceChildren()
 
       if (data.length === 0) {
@@ -618,10 +653,11 @@
     }
     vh.addEventListener('click',ur)
     vh.innerHTML = RATE_PER_UNIT
+     
 
   </script>
 
-  <!-- External canvas exporter — must load AFTER the inline script above -->
+  <!-- External canvas exporter — must load AhER the inline script above -->
   <script src="meter-export.js"></script>
 
 </body>
