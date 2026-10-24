@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>How to use — Meter Reading &amp; Billing</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+
+    :root {
+      --cyan-50: #f0fdff;
+      --cyan-100: #d6f6fb;
+      --cyan-200: #aeeaf4;
+      --cyan-300: #6fd8ea;
+      --cyan-500: #06b6d4;
+      --cyan-600: #0891b2;
+      --cyan-700: #0e7490;
+      --cyan-900: #164e63;
+      --ink: #12313a;
+      --muted: #5d8592;
+      --line: #d9eff5;
+      --white: #ffffff;
+      --danger: #e11d48;
+    }
+
+    body {
+      margin: 0;
+      padding: 36px 16px 72px;
+      min-height: 100vh;
+      font-family: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(1100px 480px at 8% -12%, var(--cyan-100), transparent 62%),
+        radial-gradient(900px 420px at 100% 0%, #e6fbff, transparent 58%),
+        var(--white);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+    }
+
+    .card {
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 34px 34px 40px;
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      box-shadow: 0 22px 50px -32px rgba(8, 145, 178, .5);
+    }
+
+    .back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 18px;
+      padding: 8px 14px;
+      font-size: .85rem;
+      font-weight: 600;
+      color: var(--cyan-700);
+      text-decoration: none;
+      background: var(--white);
+      border: 1px solid var(--cyan-200);
+      border-radius: 999px;
+      transition: background .18s ease, border-color .18s ease;
+    }
+    .back:hover { background: var(--cyan-50); border-color: var(--cyan-300); }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 1.7rem;
+      line-height: 1.2;
+      letter-spacing: -.02em;
+      color: var(--cyan-900);
+    }
+
+    .lede {
+      margin: 0 0 28px;
+      font-size: .98rem;
+      color: var(--muted);
+    }
+
+    h2 {
+      margin: 30px 0 12px;
+      font-size: 1.12rem;
+      letter-spacing: -.01em;
+      color: var(--cyan-900);
+      padding-bottom: 6px;
+      border-bottom: 2px solid var(--cyan-100);
+    }
+
+    h3 {
+      margin: 20px 0 8px;
+      font-size: .98rem;
+      color: var(--cyan-700);
+    }
+
+    p, li { font-size: .93rem; }
+    ul, ol { margin: 8px 0 12px 22px; padding: 0; }
+    li { margin-bottom: 6px; }
+    strong { color: var(--ink); }
+
+    code {
+      padding: 2px 6px;
+      font-size: .85em;
+      background: var(--cyan-50);
+      border: 1px solid var(--cyan-200);
+      border-radius: 5px;
+      color: var(--cyan-700);
+      font-family: ui-monospace, "SF Mono", Consolas, monospace;
+    }
+
+    kbd {
+      padding: 2px 6px;
+      font-size: .82em;
+      background: var(--white);
+      border: 1px solid var(--cyan-200);
+      border-bottom-width: 2px;
+      border-radius: 4px;
+      color: var(--cyan-700);
+      font-family: inherit;
+    }
+
+    .note {
+      margin: 14px 0;
+      padding: 12px 16px;
+      font-size: .88rem;
+      background: var(--cyan-50);
+      border-left: 4px solid var(--cyan-500);
+      border-radius: 8px;
+      color: var(--muted);
+    }
+    .note strong { color: var(--cyan-900); }
+
+    .warn {
+      background: #fff7ed;
+      border-left-color: #f59e0b;
+    }
+
+    table.ref {
+      width: 100%;
+      margin: 12px 0 18px;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: .88rem;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    table.ref th {
+      padding: 10px 12px;
+      text-align: left;
+      font-size: .74rem;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--white);
+      background: linear-gradient(180deg, var(--cyan-600), var(--cyan-700));
+    }
+    table.ref td {
+      padding: 10px 12px;
+      border-top: 1px solid var(--line);
+      vertical-align: top;
+    }
+    table.ref tr:nth-child(even) td { background: var(--cyan-50); }
+
+    .example {
+      display: grid;
+      grid-template-columns: max-content 1fr;
+      gap: 6px 18px;
+      padding: 14px 18px;
+      margin: 12px 0;
+      font-size: .9rem;
+      background: var(--cyan-50);
+      border: 1px solid var(--cyan-200);
+      border-radius: 10px;
+    }
+    .example dt { font-weight: 700; color: var(--cyan-700); }
+    .example dd { margin: 0; color: var(--ink); }
+
+    /* Layout diagram of the exported PNG */
+    .png-map {
+      margin: 18px 0;
+      padding: 18px;
+      background: var(--cyan-50);
+      border: 1px solid var(--cyan-200);
+      border-radius: 12px;
+      font-size: .82rem;
+    }
+    .png-map .zone {
+      padding: 10px 14px;
+      margin-bottom: 8px;
+      background: var(--white);
+      border: 1px dashed var(--cyan-300);
+      border-radius: 8px;
+      color: var(--muted);
+    }
+    .png-map .zone:last-child { margin-bottom: 0; }
+    .png-map .zone strong { color: var(--cyan-900); display: block; margin-bottom: 4px; }
+    .png-map .zone.footer {
+      text-align: center;
+      background: var(--white);
+      border-style: solid;
+      border-color: var(--line);
+      border-radius: 999px;
+      padding: 6px 14px;
+      width: fit-content;
+      margin-left: auto;
+      margin-right: auto;
+      font-size: .78rem;
+    }
+
+    footer {
+      margin-top: 34px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+      font-size: .85rem;
+      text-align: center;
+      color: var(--muted);
+    }
+    footer a { color: var(--cyan-700); }
+
+    @media (max-width: 560px) {
+      body { padding: 20px 10px 48px; }
+      .card { padding: 22px 18px 28px; border-radius: 16px; }
+      h1 { font-size: 1.4rem; }
+      h2 { font-size: 1.05rem; }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="card">
+    <a href="index.html" class="back">&larr; Back to the app</a>
+
+    <h1>How to use Meter Reading &amp; Billing</h1>
+    <p class="lede">
+      A quick guide to adding readings, managing outstanding balances, editing records,
+      exporting images, and reading the exported PNG correctly.
+    </p>
+
+    <h2>1. Adding a record</h2>
+    <p>Fill in the four fields at the top of the main page:</p>
+    <table class="ref">
+      <thead>
+        <tr><th>Field</th><th>What to enter</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Customer Name</strong></td>
+          <td>The customer's name (free text).</td>
+        </tr>
+        <tr>
+          <td><strong>Previous Unit</strong></td>
+          <td>The meter reading from last month.</td>
+        </tr>
+        <tr>
+          <td><strong>Current Unit</strong></td>
+          <td>This month's reading. Must be higher than the previous unit.</td>
+        </tr>
+        <tr>
+          <td><strong>Previous Outstanding (₦)</strong></td>
+          <td>
+            Optional. Any amount the customer already owed from before this month.
+            Leave empty for ₦0.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <p>Then click <strong>Add Record</strong>, or press <kbd>Enter</kbd> in any field.</p>
+
+    <div class="note">
+      <strong>Validation:</strong> the app will refuse to save if the current unit is not
+      strictly greater than the previous unit, or if the outstanding figure is negative.
+    </div>
+
+    <h2>2. Understanding the columns</h2>
+    <table class="ref">
+      <thead>
+        <tr><th>Column</th><th>Meaning</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Previous / Current</strong></td><td>The two meter readings.</td></tr>
+        <tr><td><strong>Used</strong></td><td>Units consumed = Current &minus; Previous.</td></tr>
+        <tr><td><strong>Cost (₦)</strong></td><td>Exact cost = Used &times; Rate per unit.</td></tr>
+        <tr>
+          <td><strong>Payable (₦)</strong></td>
+          <td>
+            Cost rounded to the <em>nearest ₦5</em>, so the customer pays a cash-friendly
+            figure. The shift from the exact cost is at most &plusmn;₦2.
+          </td>
+        </tr>
+        <tr>
+          <td><strong>Owed (₦)</strong></td>
+          <td>Previous outstanding balance entered at the time the record was saved.</td>
+        </tr>
+        <tr>
+          <td><strong>Balance (₦)</strong></td>
+          <td><code>Payable + Owed</code> &mdash; the full amount the customer owes now.</td>
+        </tr>
+        <tr>
+          <td><strong>Summary</strong></td>
+          <td>A one-paragraph plain-English description of the record.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Worked example</h3>
+    <dl class="example">
+      <dt>Rate</dt><dd>₦250 per unit</dd>
+      <dt>Previous</dt><dd>1,200 units</dd>
+      <dt>Current</dt><dd>1,345 units</dd>
+      <dt>Used</dt><dd>145 units</dd>
+      <dt>Cost</dt><dd>145 &times; ₦250 = <strong>₦36,250</strong></dd>
+      <dt>Payable</dt><dd>Rounded to nearest ₦5 = <strong>₦36,250</strong></dd>
+      <dt>Owed</dt><dd>₦5,000</dd>
+      <dt>Balance</dt><dd>₦36,250 + ₦5,000 = <strong>₦41,250</strong></dd>
+    </dl>
+
+    <div class="note warn">
+      <strong>Why round to ₦5?</strong>
+      ₦1 and ₦2 coins are rarely in circulation, so rounding the payable figure to the
+      nearest ₦5 keeps the amount cash-friendly. The shift is tiny &mdash; at most ₦2 either
+      way &mdash; and the <em>Cost</em> column always shows the exact amount, so nothing is hidden.
+    </div>
+
+    <h2>3. Reading the totals</h2>
+    <p>
+      The exported image shows three summary figures under the title (each is the sum
+      across <em>all</em> saved records):
+    </p>
+    <table class="ref">
+      <thead>
+        <tr><th>Figure</th><th>What it sums</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Units used</strong></td>
+          <td>Every row's <em>Used</em> column added together.</td>
+        </tr>
+        <tr>
+          <td><strong>Total owed</strong></td>
+          <td>Every row's <em>Owed</em> column added together (previous arrears only).</td>
+        </tr>
+        <tr>
+          <td><strong>Total</strong></td>
+          <td>
+            Every row's <em>Balance</em> column added together &mdash;
+            i.e. <code>Total Payable + Total Owed</code>. This is the overall amount
+            receivable across all customers.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="note">
+      <strong>Don't confuse "Total owed" with "Total":</strong> <em>Total owed</em> is only
+      what was carried over from before; <em>Total</em> is everything the customers owe
+      now (this month's charge + arrears).
+    </div>
+
+    <h2>4. Navigating the exported PNG</h2>
+    <p>
+      When you click <strong>Download PNG</strong> or <strong>Share Image</strong>, the app
+      draws one image containing everything on screen. Here is how to read it, top to bottom:
+    </p>
+
+    <div class="png-map">
+      <div class="zone">
+        <strong>① Title bar</strong>
+        "Meter Reading &amp; Billing Records" &mdash; just the heading of the sheet.
+      </div>
+      <div class="zone">
+        <strong>② Summary line</strong>
+        Shows <em>Generated date &middot; record count &middot; rate per unit &middot;
+        Units used &middot; Total owed &middot; Total</em>.
+        These three figures are your headline totals &mdash; see section 3 above for what
+        each one means.
+      </div>
+      <div class="zone">
+        <strong>③ Table</strong>
+        Every saved record, one row per customer, newest at the top. Columns run left to right:
+        S/N, Customer Name, Previous, Current, Used, Cost, Payable, Owed, Balance, Summary.
+        Money columns are highlighted in cyan.
+      </div>
+      <div class="zone footer">
+        Powered by <strong>MRB99</strong> &middot; mrb99.vercel.app
+      </div>
+    </div>
+
+    <h3>Quick tips when scanning the PNG</h3>
+    <ul>
+      <li>
+        <strong>Looking for one customer?</strong> Read down the <em>Customer Name</em>
+        column. The order matches the app (newest first).
+      </li>
+      <li>
+        <strong>Looking for who owes the most?</strong> Sort mentally by the
+        <em>Balance (₦)</em> column &mdash; that is the number a customer must clear to be
+        fully paid up (this month + arrears).
+      </li>
+      <li>
+        <strong>Need only the arrears figure?</strong> Use the <em>Owed (₦)</em> column.
+        Rows with &mdash; have no prior balance.
+      </li>
+      <li>
+        <strong>Checking why a total is what it is?</strong> Add up the
+        <em>Balance (₦)</em> column of every row &mdash; it will equal the <em>Total</em>
+        in the summary line. Add up <em>Owed (₦)</em> only and you'll get the
+        <em>Total owed</em>. They are not the same figure.
+      </li>
+      <li>
+        <strong>Zooming on mobile:</strong> pinch to zoom into the PNG like any photo.
+        Text stays sharp because the image is rendered at 2× resolution.
+      </li>
+    </ul>
+
+    <div class="note">
+      The PNG is a <em>snapshot</em>. If you add, edit, or delete records afterwards, you
+      must download a new PNG to reflect the changes &mdash; the file already saved on your
+      device will not update.
+    </div>
+
+    <h2>5. Editing a customer name</h2>
+    <ol>
+      <li>Click the <strong>customer name</strong> in the table (underlined with a dotted line).</li>
+      <li>A small editor appears under the name with the current name filled in.</li>
+      <li>Type the new name and click <strong>Update</strong>.</li>
+      <li>Click <strong>Cancel</strong> to leave it unchanged.</li>
+    </ol>
+    <div class="note">
+      Only the name can be edited this way &mdash; not the units, cost, or outstanding
+      balance. Those are locked once saved so a past bill cannot be silently altered.
+      If a reading was entered wrong, delete the row and re-add it.
+    </div>
+
+    <h2>6. Deleting a record</h2>
+    <ol>
+      <li>Find the <strong>&times;</strong> button at the end of the row.</li>
+      <li>Click it. A confirmation dialog appears.</li>
+      <li>Click <strong>OK</strong> to permanently remove the record, or <strong>Cancel</strong> to keep it.</li>
+    </ol>
+
+    <h2>7. Downloading and sharing</h2>
+    <h3>Download PNG</h3>
+    <p>
+      Saves the whole table as a single image named
+      <code>meter-records-YYYY-MM-DD.png</code>. Perfect for printing or archiving.
+      See section 4 for how to read the image.
+    </p>
+
+    <h3>Share Image</h3>
+    <p>
+      Opens your device's share sheet (WhatsApp, Telegram, email, etc.). If your
+      browser does not support sharing files, the image will be downloaded instead.
+    </p>
+
+    <h2>8. Changing the rate per unit</h2>
+    <p>
+      Click the rate number shown in the subtitle (e.g. <em>"250 Naira"</em>) to
+      open the rate editor. Enter a new value and click <strong>Update</strong>.
+    </p>
+    <div class="note">
+      Changing the rate affects only <strong>new</strong> records. Existing records
+      keep the cost they were saved with, so past bills are never recalculated.
+    </div>
+
+    <h2>9. Clearing all records</h2>
+    <p>
+      Click <strong>Clear Previous Records</strong>. You will be asked to confirm.
+      Once confirmed, <strong>every record is permanently deleted</strong> from this
+      device and cannot be recovered.
+    </p>
+    <div class="note warn">
+      <strong>Back up first.</strong> Download a PNG before clearing, in case you
+      need to refer to the records later.
+    </div>
+
+    <h2>10. Where data is stored</h2>
+    <p>
+      All records are saved in your browser's <code>Storage</code>, on this
+      device only. Nothing is uploaded to a server. Clearing your browser data,
+      switching browsers, or switching devices will not carry the records over.
+    </p>
+
+    <footer>
+      Need help? <a href="mailto:etsolution.tech@gmail.com?subject=Meter%20App%20Feedback">Email us</a>.
+      &nbsp;&middot;&nbsp; Powered by <strong>MRB99</strong> &middot;
+      <a href="https://mrb99.vercel.app">mrb99.vercel.app</a>
+    </footer>
+  </main>
+</body>
+</html>
