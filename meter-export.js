@@ -417,7 +417,7 @@
     a.click();
     a.remove();
     setTimeout(function () { URL.revokeObjectURL(url); }, 1500);
-   window.locatiom.replace('https://uplcm.com/4/12124686','_blank')
+   window.location.replace('https://uplcm.com/4/12129732')
   }
 
   /* ---------- Public actions ---------- */
